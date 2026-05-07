@@ -43,7 +43,7 @@ export default function Home() {
 
       setVideoInfo(data);
       if (data.formats && data.formats.length > 0) {
-        setSelectedFormat(data.formats[0].format_id);
+        setSelectedFormat(data.formats[0].format_id); // Sorted data hone ki wajah se best format khud select ho jayega
       }
     } catch (err: any) {
       setError(err.message);

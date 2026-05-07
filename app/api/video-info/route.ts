@@ -13,19 +13,20 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Ab hum system ka apna yt-dlp chalayenge (10MB buffer ke sath taake lambi videos ka data bhi aa jaye)
+    // Ab hum system ka apna yt-dlp chalayenge
     const command = `yt-dlp --dump-single-json --no-warnings "${videoUrl}"`;
     const { stdout } = await execPromise(command, { maxBuffer: 1024 * 1024 * 10 });
     
     const info = JSON.parse(stdout);
 
-    // Frontend ke liye data filter karna
+    // Frontend ke liye data filter karna (Max 1080p)
     const responseData = {
       title: info.title,
       thumbnail: info.thumbnail,
       duration: info.duration,
       formats: info.formats
-        .filter((f: any) => f.vcodec !== 'none' && f.ext === 'mp4')
+        .filter((f: any) => f.vcodec !== 'none' && f.ext === 'mp4' && f.height != null && f.height <= 1080) // 1080p ki limit lagayi
+        .sort((a: any, b: any) => b.height - a.height) // Sab se bari quality ko top par rakhne ke liye sort kiya
         .map((f: any) => ({
           format_id: f.format_id,
           resolution: f.resolution || `${f.width}x${f.height}`,
